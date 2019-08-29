@@ -1,27 +1,61 @@
 import { useEffect, useState } from "react";
 import { Push, Repeater, RepeaterBuffer, Stop } from "@repeaterjs/repeater";
 
-export function useAsyncIter<T>(
-  callback: () => AsyncIterableIterator<T>,
+// Repeaters are lazy, hooks are eager.
+// We need to return push and stop synchronously from the useRepeater hook so
+// we prime the repeater by calling next immediately.
+function createPrimedRepeater<T>(
+	buffer?: RepeaterBuffer<T>,
+): [Repeater<T>, Push<T>, Stop] {
+  let push: Push<T>;
+  let stop: Stop;
+	const repeater = new Repeater((push1, stop1) => {
+		push = push1;
+		stop = stop1;
+		// this value is thrown away
+		push(null as any);
+	}, buffer);
+	// pull and throw away the first value so the executor above runs
+	repeater.next();
+	return [repeater, push!, stop!];
+}
+
+export function useRepeater<T>(
+  buffer?: RepeaterBuffer<T>,
+): [Repeater<T>, Push<T>, Stop] {
+  const [tuple] = useState(() => createPrimedRepeater(buffer));
+  return tuple;
+}
+
+export function useAsyncIter<T, TDeps extends any[]>(
+	callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
+	deps: TDeps = [] as unknown as TDeps,
 ): AsyncIterableIterator<T> {
-  const [iter] = useState(() => callback());
+	const [repeater, push, stop] = useRepeater<TDeps>();
+  const [iter] = useState(() => callback(repeater));
+	useEffect(() => {
+		push(deps);
+	}, [...deps]);
+
   useEffect(
-    () => () => {
-      if (iter.return != null) {
-        // TODO: handle return errors
-        iter.return().catch();
-      }
-    },
+		() => () => {
+			stop();
+			if (iter.return != null) {
+				// TODO: handle return errors
+				iter.return().catch();
+			}
+		},
     [],
   );
 
   return iter;
 }
 
-export function useResult<T>(
-  callback: () => AsyncIterableIterator<T>,
+export function useResult<T, TDeps extends any[]>(
+	callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
+	deps?: TDeps,
 ): IteratorResult<T> | undefined {
-  const iter = useAsyncIter(callback);
+  const iter = useAsyncIter(callback, deps);
   const [result, setResult] = useState<IteratorResult<T>>();
   useEffect(() => {
     let mounted = true;
@@ -52,25 +86,4 @@ export function useResult<T>(
   }, [iter]);
 
   return result;
-}
-
-export function useRepeater<T>(
-  buffer?: RepeaterBuffer<T>,
-): [Repeater<T>, Push<T>, Stop] {
-  let push: Push<T>;
-  let stop: Stop;
-  const [repeater] = useState(() => {
-    const repeater = new Repeater((push1, stop1) => {
-      push = push1;
-      stop = stop1;
-    }, buffer);
-
-    // We pull the first value so that the executor runs.
-    repeater.next();
-    // The first value (null) is thrown away.
-    push(null as any);
-    return repeater;
-  });
-
-  return [repeater, push!, stop!];
 }
