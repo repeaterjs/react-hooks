@@ -1,0 +1,56 @@
+{
+  "name": "@repeaterjs/react-hooks",
+  "version": "0.1.0",
+  "description": "React hooks for using async iterators in components",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/repeaterjs/repeater",
+    "directory": "packages/repeater"
+  },
+  "license": "MIT",
+  "files": [
+    "/lib"
+  ],
+  "main": "lib/react-hooks.cjs.js",
+  "module": "lib/react-hooks.esm.js",
+  "types": "lib/react-hooks.d.ts",
+  "scripts": {
+    "prebuild": "yarn run clean",
+    "build": "rollup -c rollup.config.js",
+    "clean": "shx rm -rf ./lib",
+    "lint": "eslint --ext ts src",
+    "prepublishOnly": "yarn run test && yarn run build",
+    "test": "jest --config jest.config.js --rootDir --color"
+  },
+  "dependencies": {
+    "@repeaterjs/repeater": "^2.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/react-hooks": "^2.0.1",
+    "@types/jest": "^24.0.18",
+    "@types/react": "^16.9.2",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
+    "eslint": "^6.2.1",
+    "eslint-config-prettier": "^6.1.0",
+    "eslint-plugin-jest": "^22.15.2",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-react": "^7.14.3",
+    "jest": "^24.9.0",
+    "prettier": "^1.18.2",
+    "react": "^16.9.0",
+    "react-test-renderer": "^16.9.0",
+    "rollup": "^1.20.0",
+    "rollup-plugin-typescript2": "^0.22.1",
+    "shx": "^0.3.2",
+    "ts-jest": "^24.0.0",
+    "typescript": "^3.5.3",
+    "weak": "^1.0.1"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
