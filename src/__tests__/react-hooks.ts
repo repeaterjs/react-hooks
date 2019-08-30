@@ -1,5 +1,6 @@
+import { act } from "react-test-renderer";
 import { Repeater } from "@repeaterjs/repeater";
-import { act, renderHook } from "@testing-library/react-hooks";
+import { renderHook } from "@testing-library/react-hooks";
 import { useAsyncIter, useRepeater, useResult } from "../react-hooks";
 
 describe("useRepeater", () => {
