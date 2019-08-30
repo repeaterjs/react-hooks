@@ -22,8 +22,8 @@
     "lint": "eslint --ignore-path .gitignore .",
     "prepublishOnly": "yarn run test && yarn run build",
     "test": "jest --config jest.config.js --color",
-    "start-storybook": "start-storybook -p 1337",
-    "build-storybook": "build-storybook"
+    "start-storybook": "start-storybook -p 1337 --config-dir stories",
+    "build-storybook": "build-storybook --config-dir stories"
   },
   "dependencies": {
     "@repeaterjs/repeater": "^2.0.0"
