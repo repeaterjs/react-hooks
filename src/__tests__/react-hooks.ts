@@ -69,27 +69,30 @@ describe("useAsyncIter", () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-	test("deps", async () => {
-		const callback = jest.fn(async function*(
-			deps: AsyncIterableIterator<[number]>
-		): AsyncIterableIterator<number> {
-			for await (const [num] of deps) {
-				yield num ** 2;
-			}
+  test("deps", async () => {
+    const callback = jest.fn(async function*(
+      deps: AsyncIterableIterator<[number]>,
+    ): AsyncIterableIterator<number> {
+      for await (const [num] of deps) {
+        yield num ** 2;
+      }
     });
 
-		const { result, rerender }  = renderHook((props) => {
-			return useAsyncIter(callback, [props.num]);
-		}, {initialProps: {num: 1}});
+    const { result, rerender } = renderHook(
+      (props) => {
+        return useAsyncIter(callback, [props.num]);
+      },
+      { initialProps: { num: 1 } },
+    );
 
-		expect(await result.current.next()).toEqual({ value: 1, done: false });
-		rerender({ num: 2 });
-		expect(await result.current.next()).toEqual({ value: 4, done: false });
-		rerender({ num: 3 });
-		rerender({ num: 4 });
-		expect(await result.current.next()).toEqual({ value: 9, done: false });
-		expect(await result.current.next()).toEqual({ value: 16, done: false });
-	});
+    expect(await result.current.next()).toEqual({ value: 1, done: false });
+    rerender({ num: 2 });
+    expect(await result.current.next()).toEqual({ value: 4, done: false });
+    rerender({ num: 3 });
+    rerender({ num: 4 });
+    expect(await result.current.next()).toEqual({ value: 9, done: false });
+    expect(await result.current.next()).toEqual({ value: 16, done: false });
+  });
 });
 
 describe("useResult", () => {
@@ -150,34 +153,37 @@ describe("useResult", () => {
 
   test("deps", async () => {
     const callback = jest.fn((deps) => {
-			return new Repeater<number>(async (push1) => {
-				const push = async (num: number) => {
-					return act(() => push1(num));
-				};
+      return new Repeater<number>(async (push1) => {
+        const push = async (num: number) => {
+          return act(() => push1(num));
+        };
 
-				for await (const [num] of deps) {
-					await push(num);
-				}
+        for await (const [num] of deps) {
+          await push(num);
+        }
 
-				return -1;
-			});
+        return -1;
+      });
     });
 
-    const { result, rerender, waitForNextUpdate } = renderHook((props) => {
-      return useResult(callback, [props.num]);
-		}, { initialProps: { num: 1 } });
+    const { result, rerender, waitForNextUpdate } = renderHook(
+      (props) => {
+        return useResult(callback, [props.num]);
+      },
+      { initialProps: { num: 1 } },
+    );
 
     expect(result.current).toBeUndefined();
-		await waitForNextUpdate();
-		expect(result.current).toEqual({ value: 1, done: false });
-		rerender({ num: 2 });
-		expect(result.current).toEqual({ value: 1, done: false });
-		await waitForNextUpdate();
-		expect(result.current).toEqual({ value: 2, done: false });
-		rerender({ num: 3 });
-		expect(result.current).toEqual({ value: 2, done: false });
-		await waitForNextUpdate();
-		expect(result.current).toEqual({ value: 3, done: false });
+    await waitForNextUpdate();
+    expect(result.current).toEqual({ value: 1, done: false });
+    rerender({ num: 2 });
+    expect(result.current).toEqual({ value: 1, done: false });
+    await waitForNextUpdate();
+    expect(result.current).toEqual({ value: 2, done: false });
+    rerender({ num: 3 });
+    expect(result.current).toEqual({ value: 2, done: false });
+    await waitForNextUpdate();
+    expect(result.current).toEqual({ value: 3, done: false });
     expect(callback).toHaveBeenCalledTimes(1);
   });
 });

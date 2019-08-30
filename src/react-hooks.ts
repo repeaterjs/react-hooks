@@ -5,19 +5,19 @@ import { Push, Repeater, RepeaterBuffer, Stop } from "@repeaterjs/repeater";
 // We need to return push and stop synchronously from the useRepeater hook so
 // we prime the repeater by calling next immediately.
 function createPrimedRepeater<T>(
-	buffer?: RepeaterBuffer<T>,
+  buffer?: RepeaterBuffer<T>,
 ): [Repeater<T>, Push<T>, Stop] {
   let push: Push<T>;
   let stop: Stop;
-	const repeater = new Repeater((push1, stop1) => {
-		push = push1;
-		stop = stop1;
-		// this value is thrown away
-		push(null as any);
-	}, buffer);
-	// pull and throw away the first value so the executor above runs
-	repeater.next();
-	return [repeater, push!, stop!];
+  const repeater = new Repeater((push1, stop1) => {
+    push = push1;
+    stop = stop1;
+    // this value is thrown away
+    push(null as any);
+  }, buffer);
+  // pull and throw away the first value so the executor above runs
+  repeater.next();
+  return [repeater, push!, stop!];
 }
 
 export function useRepeater<T>(
@@ -28,32 +28,32 @@ export function useRepeater<T>(
 }
 
 export function useAsyncIter<T, TDeps extends any[]>(
-	callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
-	deps: TDeps = [] as unknown as TDeps,
+  callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
+  deps: TDeps = ([] as unknown) as TDeps,
 ): AsyncIterableIterator<T> {
-	const [repeater, push, stop] = useRepeater<TDeps>();
+  const [repeater, push, stop] = useRepeater<TDeps>();
   const [iter] = useState(() => callback(repeater));
-	useEffect(() => {
-		push(deps);
-	}, [...deps]);
+  useEffect(() => {
+    push(deps);
+  }, [push, ...deps]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(
-		() => () => {
-			stop();
-			if (iter.return != null) {
-				// TODO: handle return errors
-				iter.return().catch();
-			}
-		},
-    [],
+    () => () => {
+      stop();
+      if (iter.return != null) {
+        // TODO: handle return errors
+        iter.return().catch();
+      }
+    },
+    [iter, stop],
   );
 
   return iter;
 }
 
 export function useResult<T, TDeps extends any[]>(
-	callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
-	deps?: TDeps,
+  callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
+  deps?: TDeps,
 ): IteratorResult<T> | undefined {
   const iter = useAsyncIter(callback, deps);
   const [result, setResult] = useState<IteratorResult<T>>();

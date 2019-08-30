@@ -12,17 +12,19 @@
       "jsx": true
     }
   },
+  "plugins": [
+    "@typescript-eslint",
+    "jest",
+		"react",
+		"react-hooks",
+    "prettier"
+  ],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:jest/recommended",
     "plugin:prettier/recommended",
     "prettier/@typescript-eslint"
-  ],
-  "plugins": [
-    "@typescript-eslint",
-    "jest",
-    "prettier"
   ],
   "rules": {
     "prettier/prettier": [
@@ -45,6 +47,9 @@
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_"
       }
-    ]
+    ],
+		"react/prop-types": 0,
+		"react-hooks/rules-of-hooks": "error",
+		"react-hooks/exhaustive-deps": "warn"
   }
 }
