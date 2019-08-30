@@ -1,6 +1,7 @@
 {
   "name": "@repeaterjs/react-hooks",
   "version": "0.1.0",
+  "private": true,
   "description": "React hooks for using async iterators in components",
   "repository": {
     "type": "git",
