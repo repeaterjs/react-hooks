@@ -19,19 +19,28 @@
     "prebuild": "yarn run clean",
     "build": "rollup -c rollup.config.js",
     "clean": "shx rm -rf ./lib",
-    "lint": "eslint --ext ts src",
+    "lint": "eslint --ignore-path .gitignore .",
     "prepublishOnly": "yarn run test && yarn run build",
-    "test": "jest --config jest.config.js --rootDir --color"
+    "test": "jest --config jest.config.js --color",
+    "start-storybook": "start-storybook -p 1337",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@repeaterjs/repeater": "^2.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@storybook/addon-actions": "^5.2.0",
+    "@storybook/addon-links": "^5.2.0",
+    "@storybook/addon-storysource": "^5.2.0",
+    "@storybook/addons": "^5.2.0",
+    "@storybook/react": "^5.2.0",
     "@testing-library/react-hooks": "^2.0.1",
     "@types/jest": "^24.0.18",
     "@types/react": "^16.9.2",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
+    "babel-loader": "^8.0.6",
     "eslint": "^6.2.1",
     "eslint-config-prettier": "^6.1.0",
     "eslint-plugin-jest": "^22.15.2",

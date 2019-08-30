@@ -2,7 +2,7 @@ import path from "path";
 import typescript from "rollup-plugin-typescript2";
 
 const root = process.cwd();
-const pkg = require(path.join(root, "package.json"));
+const pkg = require(path.join(root, "package.json")); // eslint-disable-line
 
 export default {
   input: path.join(root, "src/react-hooks.ts"),
@@ -19,4 +19,5 @@ export default {
     },
   ],
   plugins: [typescript()],
+  external: ["react", "@repeaterjs/repeater"],
 };

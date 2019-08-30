@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Push, Repeater, RepeaterBuffer, Stop } from "@repeaterjs/repeater";
 
+type PrimedRepeaterTuple<T> = [Repeater<T>, Push<T>, Stop];
 // Repeaters are lazy, hooks are eager.
 // We need to return push and stop synchronously from the useRepeater hook so
 // we prime the repeater by calling next immediately.
 function createPrimedRepeater<T>(
   buffer?: RepeaterBuffer<T>,
-): [Repeater<T>, Push<T>, Stop] {
+): PrimedRepeaterTuple<T> {
   let push: Push<T>;
   let stop: Stop;
   const repeater = new Repeater((push1, stop1) => {
@@ -22,7 +23,7 @@ function createPrimedRepeater<T>(
 
 export function useRepeater<T>(
   buffer?: RepeaterBuffer<T>,
-): [Repeater<T>, Push<T>, Stop] {
+): PrimedRepeaterTuple<T> {
   const [tuple] = useState(() => createPrimedRepeater(buffer));
   return tuple;
 }
