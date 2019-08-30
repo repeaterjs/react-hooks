@@ -5,7 +5,7 @@ const root = process.cwd();
 const pkg = require(path.join(root, "package.json"));
 
 export default {
-  input: path.join(root, "src/hooks.ts"),
+  input: path.join(root, "src/react-hooks.ts"),
   output: [
     {
       file: pkg.main,
@@ -19,10 +19,4 @@ export default {
     },
   ],
   plugins: [typescript()],
-  external: [
-    "@repeaterjs/repeater",
-    "@repeaterjs/timers",
-    "@repeaterjs/pubsub",
-    "@repeaterjs/limiters",
-  ],
 };
