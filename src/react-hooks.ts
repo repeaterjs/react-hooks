@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { Push, Repeater, RepeaterBuffer, Stop } from "@repeaterjs/repeater";
 
-type PrimedRepeaterTuple<T> = [Repeater<T>, Push<T>, Stop];
 // Repeaters are lazy, hooks are eager.
 // We need to return push and stop synchronously from the useRepeater hook so
 // we prime the repeater by calling next immediately.
 function createPrimedRepeater<T>(
   buffer?: RepeaterBuffer<T>,
-): PrimedRepeaterTuple<T> {
+): [Repeater<T>, Push<T>, Stop] {
   let push: Push<T>;
   let stop: Stop;
   const repeater = new Repeater((push1, stop1) => {
@@ -23,16 +22,16 @@ function createPrimedRepeater<T>(
 
 export function useRepeater<T>(
   buffer?: RepeaterBuffer<T>,
-): PrimedRepeaterTuple<T> {
-  const [tuple] = useState(() => createPrimedRepeater(buffer));
-  return tuple;
+): [Repeater<T>, Push<T>, Stop] {
+	const [tuple] = useState(() => createPrimedRepeater(buffer));
+	return tuple;
 }
 
 export function useAsyncIter<T, TDeps extends any[]>(
   callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
   deps: TDeps = ([] as unknown) as TDeps,
 ): AsyncIterableIterator<T> {
-  const [repeater, push, stop] = useRepeater<TDeps>();
+  const [repeater, push] = useRepeater<TDeps>();
   const [iter] = useState(() => callback(repeater));
   useEffect(() => {
     push(deps);
@@ -40,13 +39,12 @@ export function useAsyncIter<T, TDeps extends any[]>(
 
   useEffect(
     () => () => {
-      stop();
       if (iter.return != null) {
         // TODO: handle return errors
         iter.return().catch();
       }
     },
-    [iter, stop],
+    [iter],
   );
 
   return iter;
