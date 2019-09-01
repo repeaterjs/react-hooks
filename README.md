@@ -51,14 +51,14 @@ Example:
 function ProductDetail({productId}) {
   const result = useResult(async function *(deps) {
     for await (const [productId] of deps) {
-			const data = await fetchProductData(productId);
-			yield data.description;
+      const data = await fetchProductData(productId);
+      yield data.description;
     }
   }, [productId]);
 
-	if (result == null) {
-		return <div>Loading...</div>;
-	}
+  if (result == null) {
+    return <div>Loading...</div>;
+  }
 
   return <div>Description: {result.value}</div>;
 }
@@ -96,40 +96,40 @@ Example:
 ```ts
 const konami = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
 function Cheats() {
-	const keys = useAsyncIter(() => {
-		return new Repeater(async (push, stop) => {
-			const listener = (ev) => push(ev.key);
-			window.addEventListener("keyup", listener);
-			await stop;
-			window.removeEventListener("keyup", listener);
-		});
-	});
+  const keys = useAsyncIter(() => {
+    return new Repeater(async (push, stop) => {
+      const listener = (ev) => push(ev.key);
+      window.addEventListener("keyup", listener);
+      await stop;
+      window.removeEventListener("keyup", listener);
+    });
+  });
 
-	const result = useResult(async function *() {
-		let i = 0;
-		yield konami[i];
-		for await (const key of keys) {
-			if (key === konami[i]) {
-				i++;
-			} else {
-				i = 0;
-			}
+  const result = useResult(async function *() {
+    let i = 0;
+    yield konami[i];
+    for await (const key of keys) {
+      if (key === konami[i]) {
+        i++;
+      } else {
+        i = 0;
+      }
 
-			if (i < konami.length) {
-				yield konami[i];
-			} else {
-				return "Cheats activated";
-			}
-		}
-	});
+      if (i < konami.length) {
+        yield konami[i];
+      } else {
+        return "Cheats activated";
+      }
+    }
+  });
 
-	if (result == null) {
-		return null;
-	} else if (result.done) {
-		return <div>🎉 {result.value} 🎉</div>;
-	}
+  if (result == null) {
+    return null;
+  } else if (result.done) {
+    return <div>🎉 {result.value} 🎉</div>;
+  }
 
-	return <div>Next key: {result.value}</div>;
+  return <div>Next key: {result.value}</div>;
 }
 ```
 
