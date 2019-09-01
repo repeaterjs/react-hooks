@@ -23,8 +23,8 @@ function createPrimedRepeater<T>(
 export function useRepeater<T>(
   buffer?: RepeaterBuffer<T>,
 ): [Repeater<T>, Push<T>, Stop] {
-	const [tuple] = useState(() => createPrimedRepeater(buffer));
-	return tuple;
+  const [tuple] = useState(() => createPrimedRepeater(buffer));
+  return tuple;
 }
 
 export function useAsyncIter<T, TDeps extends any[]>(
@@ -85,4 +85,12 @@ export function useResult<T, TDeps extends any[]>(
   }, [iter]);
 
   return result;
+}
+
+export function useValue<T, TDeps extends any[]>(
+  callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
+  deps?: TDeps,
+): T | undefined {
+  const result = useResult(callback, deps);
+  return result && result.value;
 }
