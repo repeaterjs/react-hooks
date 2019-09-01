@@ -27,7 +27,7 @@ const result = useResult(async function *() {
 });
 ```
 
-`callback` is a function which returns an async iterator, usually an async generator function. The callback will be called when the component is initialized and the returned iterator will update the component as it produces values.  `useResult` returns an `IteratorResult`, an object of type `{value: T, done: boolean}`, where `T` is the type of the produced values, and `done` indicates whether the iterator has returned. The first return value from this hook will be `undefined`, indicating that the iterator has yet to produce any values.
+`callback` is a function which returns an async iterator, usually an async generator function. The callback is called when the component initializes and the returned iterator updates the component as it produces results. `useResult` returns an `IteratorResult`, an object of type `{value: T, done: boolean}`, where `T` is the type of the produced values, and `done` indicates whether the iterator has returned. The first return value from this hook will be `undefined`, indicating that the iterator has yet to produce any values.
 
 ```ts
 function Timer() {
@@ -70,10 +70,9 @@ declare function useValue<T, TDeps extends any[]>(
 ): T | undefined;
 ```
 
-Similar to `useResult`, except the `IteratorResult`’s value is returned rather than the `IteratorResult` object itself. Use `useValue` over `useResult` when you don’t need to distinguish between whether the value was yielded or returned. `useValue` will always return `undefined` as its initial value while it awaits the iterator’s first value.
+Similar to `useResult`, except the `IteratorResult`’s value is returned rather than the `IteratorResult` object itself. Prefer `useValue` over `useResult` when you don’t need to distinguish between whether values were yielded or returned.
 
 ### `useAsyncIter`
-
 ```ts
 declare function useAsyncIter<T, TDeps extends any[]>(
   callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
@@ -87,7 +86,7 @@ const iter = useAsyncIter(async function *() {
 });
 ```
 
-Similar to `useResult`, except that `useAsyncIter` returns the async iterator rather than consuming it. The returned async iterator can be referenced via closure in further `useResult` calls. Use `useAsyncIter` over `useResult` or `useValue` when you want to use an async iterator without updating for all produced values.
+Similar to `useResult` and `useValue`, except that `useAsyncIter` returns the async iterator itself rather than consuming it. The returned async iterator can be referenced via closure in further `useResult` calls. Prefer `useAsyncIter` over `useResult` or `useValue` when you want to use an async iterator without updating each time a value is produced.
 
 ```ts
 const konami = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
@@ -140,7 +139,7 @@ import { useRepeater } from "@repeaterjs/react-hooks";
 
 Creates a repeater which can be used in useResult callbacks. `push` and `stop`
 can be used in later callbacks to update the repeater. For more information about
-the `push` and `stop` functions or the buffer argument, refer to the
+the `push` and `stop` functions or the `buffer` argument, refer to the
 [repeater.js docs](https://repeater.js.org/docs/overview).
 
 ```ts
