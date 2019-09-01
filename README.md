@@ -29,7 +29,6 @@ const result = useResult(async function *() {
 
 `callback` is a function which returns an async iterator, usually an async generator function. The callback will be called when the component is initialized and the returned iterator will update the component as it produces values.  `useResult` returns an `IteratorResult`, an object of type `{value: T, done: boolean}`, where `T` is the type of the produced values, and `done` indicates whether the iterator has returned. The first return value from this hook will be `undefined`, indicating that the iterator has yet to produce any values.
 
-Example:
 ```ts
 function Timer() {
   const result = useResult(async function*() {
@@ -46,7 +45,6 @@ function Timer() {
 
 Similar to the `useEffect` hook, `useResult` accepts an array of dependencies as a second argument. However, rather than being referenced via closure, the dependencies are passed into the callback as an async iterator which updates whenever any of the dependencies change. We pass the dependencies in manually because `callback` is only called once, and dependencies referenced via closure become stale as the component updates.
 
-Example:
 ```ts
 function ProductDetail({productId}) {
   const result = useResult(async function *(deps) {
@@ -76,7 +74,6 @@ Similar to `useResult`, except the `IteratorResult`’s value is returned rather
 
 ### `useAsyncIter`
 
-Example:
 ```ts
 declare function useAsyncIter<T, TDeps extends any[]>(
   callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
@@ -90,9 +87,8 @@ const iter = useAsyncIter(async function *() {
 });
 ```
 
-Similar to `useResult`, except that `useAsyncIter` returns the async iterator rather than consuming it. The returned async iterator can be referenced via closure in further `useResult` calls. Use `useAsyncIter` over `useResult` or `useValue` when you want to use an async iterator without updating whenever the iterator produces values.
+Similar to `useResult`, except that `useAsyncIter` returns the async iterator rather than consuming it. The returned async iterator can be referenced via closure in further `useResult` calls. Use `useAsyncIter` over `useResult` or `useValue` when you want to use an async iterator without updating for all produced values.
 
-Example:
 ```ts
 const konami = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
 function Cheats() {
@@ -147,7 +143,6 @@ can be used in later callbacks to update the repeater. For more information abou
 the `push` and `stop` functions or the buffer argument, refer to the
 [repeater.js docs](https://repeater.js.org/docs/overview).
 
-Example:
 ```ts
 function MarkdownEditor() {
   const [inputs, pushInput] = useRepeater();
