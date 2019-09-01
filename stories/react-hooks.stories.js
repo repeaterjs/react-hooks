@@ -1,8 +1,8 @@
 import React from "react"; // eslint-disable-line
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { storiesOf } from "@storybook/react";
 import { Repeater } from "@repeaterjs/repeater";
-import { useResult } from "../lib/react-hooks.esm";
+import { useAsyncIter, useResult } from "../lib/react-hooks.esm";
 
 storiesOf("useResult", module)
   .add("counter", () => {
@@ -60,4 +60,56 @@ storiesOf("useResult", module)
           result.value.map((message, i) => <div key={i}>{message}</div>)}
       </div>
     );
+  })
+  .add("konami", () => {
+    const konami = [
+      "ArrowUp",
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowLeft",
+      "ArrowRight",
+      "b",
+      "a",
+    ];
+    const keys = useAsyncIter(() => {
+      return new Repeater(async (push, stop) => {
+        const listener = (ev) => {
+          push(ev.key);
+        };
+        window.addEventListener("keyup", listener);
+        await stop;
+        window.removeEventListener("keyup", listener);
+      });
+    });
+
+    const result = useResult(async function*() {
+      let i = 0;
+      yield konami[i];
+      for await (const key of keys) {
+        if (key === konami[i]) {
+          yield `${konami[i]} (pressed)`;
+          i++;
+        } else {
+          i = 0;
+        }
+
+        if (i < konami.length) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          yield konami[i];
+        } else {
+          return "Cheats activated";
+        }
+      }
+    });
+
+    if (result == null) {
+      return null;
+    } else if (result.done) {
+      return <div>🎉 {result.value} 🎉</div>;
+    }
+
+    return <div>Next key: {result.value}</div>;
   });
