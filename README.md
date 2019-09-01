@@ -14,7 +14,6 @@ yarn add @repeaterjs/react-hooks
 
 ## API
 ### `useResult`
-
 ```ts
 declare function useResult<T, TDeps extends any[]>(
   callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
@@ -28,7 +27,7 @@ const result = useResult(async function *() {
 });
 ```
 
-`callback` is a function which returns an async iterator, usually an async generator function. The callback will be called as the component is constructed and the returned iterator will update the component as each result settles.  `useResult` returns an `IteratorResult<T>`, an object of type `{value: T, done: boolean}`, where `T` is the type of the produced values, and `done` signifies whether the iterator . The first return value from this hook will be `undefined`, signifying that the iterator has yet to produce any values.
+`callback` is a function which returns an async iterator, usually an async generator function. The callback will be called when the component is initialized and the returned iterator will update the component as it produces values.  `useResult` returns an `IteratorResult`, an object of type `{value: T, done: boolean}`, where `T` is the type of the produced values, and `done` indicates whether the iterator has returned. The first return value from this hook will be `undefined`, indicating that the iterator has yet to produce any values.
 
 Example:
 ```ts
@@ -45,8 +44,9 @@ function Timer() {
 }
 ```
 
-Similar to React’s `useEffect`, `useResult` accepts an array of dependencies as a second argument. However, rather than being referenced via closure, the dependencies are passed into the callback as an async iterator which updates whenever any of the dependencies change. We pass the dependencies in manually because `callback` is only called once, and dependencies referenced via closure become stale as the component updates.
+Similar to the `useEffect` hook, `useResult` accepts an array of dependencies as a second argument. However, rather than being referenced via closure, the dependencies are passed into the callback as an async iterator which updates whenever any of the dependencies change. We pass the dependencies in manually because `callback` is only called once, and dependencies referenced via closure become stale as the component updates.
 
+Example:
 ```ts
 function ProductDetail({productId}) {
   const result = useResult(async function *(deps) {
@@ -72,10 +72,11 @@ declare function useValue<T, TDeps extends any[]>(
 ): T | undefined;
 ```
 
-The same as `useResult`, except that the value is returned rather than the `IteratorResult` object. Use `useValue` over `useResult` when you don’t care if the iterator has produced a value or returned.
+Similar to `useResult`, except the `IteratorResult`’s value is returned rather than the `IteratorResult` object itself. Use `useValue` over `useResult` when you don’t need to distinguish between whether the value was yielded or returned. `useValue` will always return `undefined` as its initial value while it awaits the iterator’s first value.
 
 ### `useAsyncIter`
 
+Example:
 ```ts
 declare function useAsyncIter<T, TDeps extends any[]>(
   callback: (deps: AsyncIterableIterator<TDeps>) => AsyncIterableIterator<T>,
@@ -89,8 +90,9 @@ const iter = useAsyncIter(async function *() {
 });
 ```
 
-Similar to `useResult`, except that `useAsyncIter` returns the async iterator rather than consuming it. The returned async iterator can be referenced via closure in further `useResult` calls.
+Similar to `useResult`, except that `useAsyncIter` returns the async iterator rather than consuming it. The returned async iterator can be referenced via closure in further `useResult` calls. Use `useAsyncIter` over `useResult` or `useValue` when you want to use an async iterator without updating whenever the iterator produces values.
 
+Example:
 ```ts
 const konami = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
 function Cheats() {
@@ -132,7 +134,6 @@ function Cheats() {
 ```
 
 ### `useRepeater`
-
 ```ts
 declare function useRepeater<T>(
   buffer?: RepeaterBuffer<T>,
@@ -142,12 +143,11 @@ import { useRepeater } from "@repeaterjs/react-hooks";
 ```
 
 Creates a repeater which can be used in useResult callbacks. `push` and `stop`
-can be passed to children to update the repeater. For more information about
+can be used in later callbacks to update the repeater. For more information about
 the `push` and `stop` functions or the buffer argument, refer to the
 [repeater.js docs](https://repeater.js.org/docs/overview).
 
 Example:
-
 ```ts
 function MarkdownEditor() {
   const [inputs, pushInput] = useRepeater();
@@ -172,4 +172,4 @@ function MarkdownEditor() {
 ```
 
 See also:
-- [React coroutine](https://github.com/alexeyraspopov/react-coroutine)
+- [react-coroutine](https://github.com/alexeyraspopov/react-coroutine) Define React components with generators, async functions and async generators.
