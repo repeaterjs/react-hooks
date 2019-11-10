@@ -5,11 +5,11 @@ import { Push, Repeater, RepeaterBuffer, Stop } from "@repeaterjs/repeater";
 // We need to return push and stop synchronously from the useRepeater hook so
 // we prime the repeater by calling next immediately.
 function createPrimedRepeater<T>(
-  buffer?: RepeaterBuffer<T>,
+  buffer?: RepeaterBuffer,
 ): [Repeater<T>, Push<T>, Stop] {
   let push: Push<T>;
   let stop: Stop;
-  const repeater = new Repeater((push1, stop1) => {
+  const repeater = new Repeater<T>((push1, stop1) => {
     push = push1;
     stop = stop1;
     // this value is thrown away
@@ -21,9 +21,9 @@ function createPrimedRepeater<T>(
 }
 
 export function useRepeater<T>(
-  buffer?: RepeaterBuffer<T>,
+  buffer?: RepeaterBuffer,
 ): [Repeater<T>, Push<T>, Stop] {
-  const [tuple] = useState(() => createPrimedRepeater(buffer));
+  const [tuple] = useState(() => createPrimedRepeater<T>(buffer));
   return tuple;
 }
 

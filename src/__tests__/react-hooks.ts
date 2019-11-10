@@ -1,5 +1,5 @@
 import { act } from "react-test-renderer";
-import { Repeater } from "@repeaterjs/repeater";
+import { Push, Repeater, Stop } from "@repeaterjs/repeater";
 import { renderHook } from "@testing-library/react-hooks";
 import { useAsyncIter, useRepeater, useResult, useValue } from "../react-hooks";
 
@@ -98,8 +98,8 @@ describe("useAsyncIter", () => {
 
 describe("useResult", () => {
   test("basic", async () => {
-    let push: (value: number) => Promise<void>;
-    let stop: (() => void) & Promise<void>;
+    let push: Push<number>;
+    let stop: Stop;
     const repeater = new Repeater(async (push1, stop1) => {
       push = push1;
       stop = stop1;
@@ -115,22 +115,21 @@ describe("useResult", () => {
     });
 
     expect(result.current).toBeUndefined();
-    await act(() => push(1));
+    await act(async () => void (await push(1)));
     expect(result.current).toEqual({ value: 1, done: false });
-    await act(() => push(2));
+    await act(async () => void (await push(2)));
     expect(result.current).toEqual({ value: 2, done: false });
-    await act(() => push(3));
+    await act(async () => void (await push(3)));
     expect(result.current).toEqual({ value: 3, done: false });
-    await act(() => push(4));
+    await act(async () => void (await push(4)));
     expect(result.current).toEqual({ value: 4, done: false });
-    // we have to return stop here to stop act from yelling at us
     await act(async () => (stop(), stop));
     expect(result.current).toEqual({ value: -1, done: true });
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
   test("unmount", async () => {
-    let push: (value: number) => Promise<void>;
+    let push: Push<number>;
     const repeater = new Repeater(async (push1) => {
       push = push1;
       return -1;
@@ -145,7 +144,7 @@ describe("useResult", () => {
     });
 
     expect(result.current).toBeUndefined();
-    await act(() => push(1));
+    await act(async () => void (await push(1)));
     expect(result.current).toEqual({ value: 1, done: false });
     unmount();
     expect(callback).toHaveBeenCalledTimes(1);
@@ -154,11 +153,7 @@ describe("useResult", () => {
 
   test("deps", async () => {
     const callback = jest.fn((deps) => {
-      return new Repeater<number>(async (push1) => {
-        const push = async (num: number) => {
-          return act(() => push1(num));
-        };
-
+      return new Repeater<number>(async (push) => {
         for await (const [num] of deps) {
           await push(num);
         }
@@ -191,8 +186,8 @@ describe("useResult", () => {
 
 describe("useValue", () => {
   test("basic", async () => {
-    let push: (value: number) => Promise<void>;
-    let stop: (() => void) & Promise<void>;
+    let push: Push<number>;
+    let stop: Stop;
     const repeater = new Repeater(async (push1, stop1) => {
       push = push1;
       stop = stop1;
@@ -208,15 +203,14 @@ describe("useValue", () => {
     });
 
     expect(result.current).toBeUndefined();
-    await act(() => push(1));
+    await act(async () => void (await push(1)));
     expect(result.current).toBe(1);
-    await act(() => push(2));
+    await act(async () => void (await push(2)));
     expect(result.current).toBe(2);
-    await act(() => push(3));
+    await act(async () => void (await push(3)));
     expect(result.current).toBe(3);
-    await act(() => push(4));
+    await act(async () => void (await push(4)));
     expect(result.current).toBe(4);
-    // we have to return stop here to stop act from yelling at us
     await act(async () => (stop(), stop));
     expect(result.current).toBe(-1);
     rerender();
@@ -225,7 +219,7 @@ describe("useValue", () => {
   });
 
   test("unmount", async () => {
-    let push: (value: number) => Promise<void>;
+    let push: Push<number>;
     const repeater = new Repeater(async (push1) => {
       push = push1;
       return -1;
@@ -241,7 +235,7 @@ describe("useValue", () => {
     });
 
     expect(result.current).toBeUndefined();
-    await act(() => push(1));
+    await act(async () => void (await push(1)));
     expect(result.current).toBe(1);
     unmount();
     expect(callback).toHaveBeenCalledTimes(1);
@@ -250,11 +244,7 @@ describe("useValue", () => {
 
   test("deps", async () => {
     const callback = jest.fn((deps) => {
-      return new Repeater<number>(async (push1) => {
-        const push = async (num: number) => {
-          return act(() => push1(num));
-        };
-
+      return new Repeater<number>(async (push) => {
         for await (const [num] of deps) {
           await push(num);
         }
