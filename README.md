@@ -159,7 +159,7 @@ the `push` and `stop` functions or the `buffer` argument, refer to the
 
 ```ts
 function MarkdownEditor() {
-  const [inputs, pushInput] = useRepeater();
+  const [inputs, push] = useRepeater();
   const result = useResult(async function*() {
     const md = new Remarkable();
     for await (const input of inputs) {
