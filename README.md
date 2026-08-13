@@ -1,4 +1,7 @@
 # @repeaterjs/react-hooks
+
+> **Deprecated.** This project is not maintained. The Repeater.js library now lives at [bikeshaving/repeater](https://github.com/bikeshaving/repeater).
+
 React hooks for working with async iterators/generators.
 
 These functions are implemented with repeaters. For more information about repeaters, visit [repeater.js.org](https://repeater.js.org).
